@@ -19,3 +19,11 @@ class DynamoRepository:
     def get_record(self, image_id: str) -> Optional[Dict[str, Any]]:
         r = self.table.get_item(Key={"pk": image_id})
         return r.get("Item")
+
+    def set_analysis(self, image_id: str, analysis: Dict[str, Any]) -> None:
+        self.table.update_item(
+            Key={"pk": image_id},
+            UpdateExpression="SET #s = :s, analysis = :a",
+            ExpressionAttributeNames={"#s": "status"},
+            ExpressionAttributeValues={":s": "ANALYZED", ":a": analysis},
+        )

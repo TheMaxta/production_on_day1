@@ -14,8 +14,10 @@ class AppConfig:
     vlm_model: str     = field(default_factory=lambda: os.getenv("VLM_MODEL", "gpt-4o"))
     thinking_model: str= field(default_factory=lambda: os.getenv("THINKING_MODEL", "o3-mini"))
 
-    openai_key: str    = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
     anthropic_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
+
+    openai_key: str    = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))          # optional for local
+    openai_secret_name:str = field(default_factory=lambda: os.getenv("OPENAI_SECRET_NAME", ""))   # used in Lambda
 
     def validate(self) -> "AppConfig":
         missing = [k for k, v in {
