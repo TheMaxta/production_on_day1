@@ -91,6 +91,7 @@ class GenAiStack(Stack):
         # --- Permissions ---
         bucket.grant_read_write(upload_fn)
         bucket.grant_read(analyze_fn)
+        bucket.grant_write(api_fn)
         table.grant_read_write_data(upload_fn)
         table.grant_read_write_data(analyze_fn)
         upload_q.grant_send_messages(api_fn)

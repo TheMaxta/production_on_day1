@@ -1,21 +1,21 @@
+import boto3
 from typing import Any, Optional, Dict
+from boto3.resources.base import ServiceResource
 
 class DynamoRepository:
-    """Image-centric repository (stub) on a single-table design."""
+    """Minimal image record repository."""
+    def __init__(self, table_name: str, dynamodb: ServiceResource | None = None):
+        self.table = (dynamodb or boto3.resource("dynamodb")).Table(table_name)
 
     def put_image_record(self, image_id: str, s3_key: str, meta: Dict[str, Any]) -> None:
-        """
-        Create/replace image item:
-        - pk: image_id
-        - type: "image"
-        - s3_key, meta, status="UPLOADED"
-        """
-        raise NotImplementedError
+        self.table.put_item(Item={
+            "pk": image_id,
+            "type": "image",
+            "s3_key": s3_key,
+            "meta": meta,
+            "status": "UPLOADED",
+        })
 
     def get_record(self, image_id: str) -> Optional[Dict[str, Any]]:
-        """Fetch image record by id or None if missing."""
-        raise NotImplementedError
-
-    def set_analysis(self, image_id: str, analysis: Dict[str, Any]) -> None:
-        """Attach analysis payload and set status='DONE'."""
-        raise NotImplementedError
+        r = self.table.get_item(Key={"pk": image_id})
+        return r.get("Item")

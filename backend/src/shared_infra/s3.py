@@ -1,16 +1,26 @@
-from typing import Optional
+import boto3
+from botocore.client import BaseClient
 
 class S3Client:
-    """Thin S3 CRUD facade (stub)."""
+    """Minimal S3 operations."""
+    def __init__(self, bucket: str, s3: BaseClient | None = None):
+        self.bucket = bucket
+        self.s3 = s3 or boto3.client("s3")
 
     def presign_put(self, key: str, content_type: str, expires: int = 900) -> str:
-        """Return a presigned PUT URL for key/content_type."""
-        raise NotImplementedError
+        return self.s3.generate_presigned_url(
+            "put_object",
+            Params={"Bucket": self.bucket, "Key": key, "ContentType": content_type},
+            ExpiresIn=expires,
+            HttpMethod="PUT",
+        )
 
     def presign_get(self, key: str, expires: int = 900) -> str:
-        """Return a presigned GET URL for key."""
-        raise NotImplementedError
+        return self.s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": self.bucket, "Key": key},
+            ExpiresIn=expires,
+        )
 
-    def put_bytes(self, key: str, data: bytes, content_type: Optional[str] = None) -> None:
-        """Store raw bytes into S3 (optional path for tests/tools)."""
-        raise NotImplementedError
+    def head(self, key: str) -> dict:
+        return self.s3.head_object(Bucket=self.bucket, Key=key)
