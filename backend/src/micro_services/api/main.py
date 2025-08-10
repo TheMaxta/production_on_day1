@@ -33,6 +33,10 @@ class ApiService:
 app = FastAPI(title="GenAI AWS API", version="0.0.1")
 svc = ApiService()
 
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
+
 @app.post("/uploads/presign", response_model=PresignResp, tags=["uploads"])
 def presign(req: PresignReq):
     # Stubbed: expose API shape for Swagger UI

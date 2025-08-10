@@ -41,7 +41,7 @@ class GenAiStack(Stack):
             self, "AnalyzeQueue",
             visibility_timeout=cdk.Duration.seconds(300)  # >= 60s
         )
-
+        
         # Common Lambda env
         common_env = {
             "APP_BUCKET": bucket.bucket_name,

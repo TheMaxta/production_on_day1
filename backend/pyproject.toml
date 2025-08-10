@@ -1,32 +1,32 @@
-[project]
+[tool.poetry]
 name = "genai-aws"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Max Mahlke",email = "themaxta@gmail.com"}
-]
+authors = ["Max Mahlke <themaxta@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
-dependencies = [
-    "fastapi (>=0.116.1,<0.117.0)",
-    "uvicorn (>=0.35.0,<0.36.0)",
-    "boto3 (>=1.40.6,<2.0.0)",
-    "pydantic (>=2.11.7,<3.0.0)",
-    "jinja2 (>=3.1.6,<4.0.0)",
-    "pillow (>=11.3.0,<12.0.0)",
-    "python-dotenv (>=1.1.1,<2.0.0)",
-    "openai (>=1.99.6,<2.0.0)",
-    "mangum (>=0.19.0,<0.20.0)",
-]
 
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+fastapi = ">=0.116.1,<0.117.0"
+uvicorn = ">=0.35.0,<0.36.0"
+boto3 = ">=1.40.6,<2.0.0"
+pydantic = ">=2.11.7,<3.0.0"
+jinja2 = ">=3.1.6,<4.0.0"
+pillow = ">=11.3.0,<12.0.0"
+python-dotenv = ">=1.1.1,<2.0.0"
+openai = ">=1.99.6,<2.0.0"
+mangum = ">=0.19.0,<0.20.0"
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
 
 [tool.poetry.group.dev.dependencies]
 aws-lambda-powertools = "^3.18.0"
 pydantic-settings = "^2.10.1"
 aws-cdk-lib = ">=2.140,<3"
 constructs = ">=10,<11"
-aws-cdk-aws-lambda-python-alpha = {version = ">=2.140.0a0,<3", allow-prereleases = true}
+aws-cdk-aws-lambda-python-alpha = { version = ">=2.140.0a0,<3", allow-prereleases = true }
+
+[build-system]
+requires = ["poetry-core>=1.7.0,<2.0.0"]
+build-backend = "poetry.core.masonry.api"
