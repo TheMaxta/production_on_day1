@@ -1,20 +1,26 @@
-from .schema import AnalyzeJob
+from app_config import AppConfig
+from shared_infra.dynamo import DynamoRepository
+from shared_tools.prompt_warehouse.registry import PromptRegistry
+from shared_tools.completions import build_completions
 
 class AnalyzeImageWorker:
-    """
-    SQS worker that runs vision analysis. STUB ONLY.
+    """Loads image record, renders prompt, calls provider, saves analysis."""
+    def __init__(self, cfg: AppConfig | None = None):
+        self.cfg = (cfg or AppConfig()).validate()
+        self.repo = DynamoRepository(table_name=self.cfg.table)
+        self.prompts = PromptRegistry()
+        self.completions = build_completions(self.cfg)
 
-    Minimal logic (later):
-    - Read record from Dynamo using image_id (from SQS payload)
-    - Render prompt via PromptWarehouse
-    - Call CompletionsClient (env-provided model)
-    - Save analysis back to Dynamo
-    """
-
-    def __init__(self) -> None:
-        # Inject DynamoRepository, PromptWarehouse, CompletionsClient in step 5.
-        pass
-
-    def handle_job(self, job: AnalyzeJob) -> None:
-        """Process one analyze job."""
-        raise NotImplementedError
+    def handle_job(self, image_id: str) -> None:
+        item = self.repo.get_record(image_id)
+        if not item: return
+        url = item.get("meta", {}).get("url")
+        if not url: return
+        p = self.prompts.render(
+            "image_describe_v1",
+            tone="neutral",
+            audience="a general user",
+            style="concise",
+        )
+        text = self.completions.vlm(p.system, p.user, image_url=url)
+        self.repo.set_analysis(image_id, {"provider": self.cfg.provider, "model": self.cfg.vlm_model, "text": text})

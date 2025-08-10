@@ -2,3 +2,4 @@ fastapi>=0.111
 mangum>=0.17
 pydantic>=2
 jinja2>=3
+openai>=1.40

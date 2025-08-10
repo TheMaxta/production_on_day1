@@ -1,26 +1,26 @@
-from typing import Dict
-from jinja2 import Template
-from .models import Prompt
+from dataclasses import dataclass
+from typing import Tuple
+from jinja2 import Environment, DictLoader, StrictUndefined
+from .prompts import PROMPTS
 
-class PromptWarehouse:
-    """
-    Stores/retrieves Prompt objects and renders Jinja templates (stub).
-    """
+@dataclass(frozen=True)
+class RenderedPrompt:
+    name: str
+    system: str
+    user: str
 
-    def __init__(self) -> None:
-        self._prompts: Dict[str, Prompt] = {
-            "image.describe": Prompt(
-                name="image.describe",
-                system="You are a helpful vision assistant. Be concise.",
-                user_template="Describe this image. {{ extra | default('') }}"
-            )
-        }
+class PromptRegistry:
+    """Jinja-backed prompt loader and renderer."""
+    def __init__(self, templates: dict | None = None):
+        self._templates = templates or PROMPTS
+        # flatten into jinja dict loader keys like "<name>/system" and "<name>/user"
+        sources = {}
+        for name, parts in self._templates.items():
+            sources[f"{name}/system"] = parts.get("system","")
+            sources[f"{name}/user"]   = parts.get("user","")
+        self.env = Environment(loader=DictLoader(sources), undefined=StrictUndefined, autoescape=False)
 
-    def get(self, name: str) -> Prompt:
-        """Return a Prompt by name."""
-        return self._prompts[name]
-
-    def render_user(self, name: str, **kwargs) -> str:
-        """Render the user_template using Jinja with kwargs."""
-        p = self.get(name)
-        return Template(p.user_template).render(**kwargs).strip()
+    def render(self, name: str, **kwargs) -> RenderedPrompt:
+        sys_t = self.env.get_template(f"{name}/system")
+        usr_t = self.env.get_template(f"{name}/user")
+        return RenderedPrompt(name=name, system=sys_t.render(**kwargs), user=usr_t.render(**kwargs))

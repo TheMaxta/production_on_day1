@@ -64,7 +64,8 @@ def notify(req: EnqueueUploadReq):
 
 @app.post("/analyze", tags=["analyze"])
 def analyze(req: AnalyzeReq):
-    raise HTTPException(status_code=501, detail="Not implemented (stub)")
+    svc.sqs.send_analyze_job({"image_id": req.image_id})
+    return {"enqueued": True}
 
 @app.get("/images/{image_id}", tags=["images"])
 def get_image(image_id: str):

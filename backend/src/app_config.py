@@ -3,14 +3,19 @@ import os
 
 @dataclass(frozen=True)
 class AppConfig:
-    """Process-level configuration sourced from environment variables."""
     region: str        = field(default_factory=lambda: os.getenv("AWS_REGION", "us-west-2"))
     bucket: str        = field(default_factory=lambda: os.getenv("APP_BUCKET", ""))
     table: str         = field(default_factory=lambda: os.getenv("APP_TABLE", ""))
     upload_q: str      = field(default_factory=lambda: os.getenv("UPLOAD_QUEUE_URL", ""))
     analyze_q: str     = field(default_factory=lambda: os.getenv("ANALYZE_QUEUE_URL", ""))
-    openai_model: str  = field(default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4o-mini"))
+
+    provider: str      = field(default_factory=lambda: os.getenv("COMPLETIONS_PROVIDER", "openai"))
+    small_model: str   = field(default_factory=lambda: os.getenv("SMALL_MODEL", "gpt-4o-mini"))
+    vlm_model: str     = field(default_factory=lambda: os.getenv("VLM_MODEL", "gpt-4o"))
+    thinking_model: str= field(default_factory=lambda: os.getenv("THINKING_MODEL", "o3-mini"))
+
     openai_key: str    = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
+    anthropic_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
 
     def validate(self) -> "AppConfig":
         missing = [k for k, v in {

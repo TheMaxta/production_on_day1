@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_lambda as lambda_,
     aws_apigatewayv2 as apigw2,
     aws_apigatewayv2_integrations as apigw2_i,
+    aws_secretsmanager as secretsmanager, 
 )
 from aws_cdk.aws_lambda_python_alpha import PythonFunction
 from aws_cdk.aws_lambda_event_sources import SqsEventSource
@@ -83,6 +84,13 @@ class GenAiStack(Stack):
             timeout=cdk.Duration.seconds(60),
             memory_size=512,
         )
+
+        # Secret: reference existing by name and grant only analyze_fn
+        openai_secret = secretsmanager.Secret.from_secret_name_v2(
+            self, "OpenAISecret", "openai/api_key"
+        )
+        openai_secret.grant_read(analyze_fn)
+        analyze_fn.add_environment("OPENAI_SECRET_NAME", openai_secret.secret_name)
 
         # --- Event source mappings ---
         upload_fn.add_event_source(SqsEventSource(upload_q))
