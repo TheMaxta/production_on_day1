@@ -69,4 +69,7 @@ def analyze(req: AnalyzeReq):
 
 @app.get("/images/{image_id}", tags=["images"])
 def get_image(image_id: str):
-    return svc.get_image(image_id)
+    item = svc.get_image(image_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="not found")
+    return item

@@ -36,3 +36,6 @@ cdk.out/*
 backend/cdk/cdk.out/*
 
 backend/images/*
+
+local.env
+frontend/local.env
